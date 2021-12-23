@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: NanKe
  * @Date: 2021-12-21 19:55:43
- * @LastEditTime: 2021-12-23 09:43:23
+ * @LastEditTime: 2021-12-23 10:03:30
  * @LastEditors: NanKe
  * @Cnblogs: https://www.cnblogs.com/NanKe-Studying/
  * @FilePath: \Chat-Socket.io-ExpressJS\web\src\views\Home.vue
@@ -168,7 +168,6 @@ export default {
   watch: {},
   methods: {
     Login() {
-      console.log("123");
       if (this.userName.trim().length === 0) {
         this.$Message.warning({
           content: "The name cannot be empty！",
