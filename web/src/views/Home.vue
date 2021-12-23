@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: NanKe
  * @Date: 2021-12-21 19:55:43
- * @LastEditTime: 2021-12-23 10:03:30
+ * @LastEditTime: 2021-12-23 21:10:05
  * @LastEditors: NanKe
  * @Cnblogs: https://www.cnblogs.com/NanKe-Studying/
  * @FilePath: \Chat-Socket.io-ExpressJS\web\src\views\Home.vue
@@ -10,84 +10,189 @@
 <template>
   <div>
     <div
-      class="wrap has-background-primary is-flex is-justify-content-center py-4"
+      class="
+        animate__animated animate__fadeInDown
+        wrap
+        has-background-primary
+        is-flex is-justify-content-center
+        py-2
+      "
     >
-      <p class="has-text-white is-size-4" href="#">NanKe's Chat</p>
+      <p class="has-text-white is-size-5-desktop is-size-6-touch" href="#">
+        NanKe's Chat
+      </p>
     </div>
-    <div class="container is-max-widescreen mt-6 px-5">
+    <div
+      class="
+        container
+        is-max-widescreen
+        mt-6
+        px-3
+        animate__animated animate__fadeInUp
+      "
+    >
       <div class="columns is-justify-content-space-between">
         <div class="column is-one-third">
-          <p class="title is-5 has-text-primary has-text-centered">
+          <p
+            class="
+              title
+              is-size-5-desktop is-size-6-touch
+              has-text-primary has-text-centered
+            "
+          >
             在线用户列表
           </p>
-          <div class="dropdown-content">
+          <div class="dropdown-content div-box">
             <template v-if="loginUserList.length > 0">
               <div v-for="(item, index) in loginUserList" :key="index">
-                <a
+                <p
                   href="#"
                   class="
                     dropdown-item
-                    is-family-secondary is-size-6
-                    has-text-centered
+                    is-size-6-desktop is-size-7-touch
+                    has-text-centered has-text-weight-semibold
+                    list-p
                   "
-                  >{{ item }}
-                </a>
-                <hr class="dropdown-divider" />
+                >
+                  {{ item }}
+                </p>
               </div>
             </template>
             <template v-else>
-              <p class="subtitle is-7 has-text-grey has-text-centered py-2">
+              <p
+                class="
+                  subtitle
+                  is-size-6-desktop is-size-7-touch
+                  has-text-grey has-text-centered
+                  py-2
+                "
+              >
                 暂无用户！
               </p>
             </template>
           </div>
         </div>
-        <div class="column is-offset-1">
-          <template v-if="isLogin">
-            <div class="card px-1">
+        <div style="position: relative" class="column is-offset-1">
+          <transition
+            mode="in-out"
+            enter-active-class="animate__animated animate__fadeInLeft"
+            leave-active-class="animate__animated animate__fadeOutRight "
+          >
+            <div
+              class="card"
+              v-show="isLogin"
+              style="position: absolute; width: 100%"
+            >
               <div class="card-content">
-                <p class="title is-5 has-text-primary has-text-centered">
-                  {{ isLoginTip }}
-                </p>
+                <div
+                  class="
+                    pb-4
+                    is-flex
+                    is-justify-content-space-between
+                    is-align-items-center
+                  "
+                >
+                  <p
+                    class="
+                      has-text-weight-semibold
+                      is-size-5-desktop is-size-6-touch
+                      has-text-primary has-text-centered
+                    "
+                  >
+                    {{ isLoginTip }}
+                  </p>
+                  <button
+                    class="button is-danger is-light is-small"
+                    @click="Disconnect"
+                  >
+                    <span class="icon">
+                      <i class="iconfont icon-tuichu"></i>
+                    </span>
+                    <span>退出连接</span>
+                  </button>
+                </div>
+
                 <article class="message is-link">
                   <div class="message-body">
-                    <template v-if="messageList.length > 0">
+                    <div v-show="messageList.length > 0">
                       <p
-                        class="title is-6 mb-3 has-text-link has-text-centered"
+                        class="
+                          title
+                          is-size-6-desktop is-size-7-touch
+                          mb-3
+                          has-text-link has-text-centered
+                        "
                       >
                         消息列表
                       </p>
-                      <ul style="max-height: 150px; overflow: auto">
+                      <ul ref="ulbox" class="ul-box">
                         <li v-for="(item, index) in messageList" :key="index">
-                          <div class="tags has-addons">
+                          <div
+                            class="
+                              tags
+                              has-addons has-background-warning-light
+                              pl-3
+                            "
+                          >
                             <span
                               class="
-                                subtitle
-                                is-6
-                                pt-1
+                                is-size-6-desktop is-size-7-touch
                                 has-text-weight-semibold
                               "
                               >{{ item.userName }}：</span
                             >
-                            <span class="subtitle is-6 pt-1 has-text-grey">{{
-                              item.msg
-                            }}</span>
+                            <span
+                              class="
+                                is-size-6-desktop is-size-7-touch
+                                has-text-black-bis
+                              "
+                              >{{ item.msg }}</span
+                            >
                             <hr />
                           </div>
                         </li>
                       </ul>
-                    </template>
-                    <template v-else>
-                      <span class="subtitle is-7 has-text-grey"
+                    </div>
+                    <div v-show="messageList.length === 0">
+                      <span
+                        class="
+                          subtitle
+                          is-size-6-desktop is-size-7-touch
+                          has-text-grey
+                        "
                         >赶快分享该界面邀请您的好友进行对话吧！</span
                       >
-                    </template>
+                    </div>
                   </div>
                 </article>
                 <div class="field pt-1">
                   <label class="label">Message</label>
                   <div class="control">
+                    <div class="py-2">
+                      <i
+                        @click="emojiFunc"
+                        class="iconfont icon-emoji"
+                        :class="{ thumeColor: isEmoji }"
+                        style="font-size: 25px; cursor: pointer"
+                      >
+                        <picker
+                          v-show="isEmoji"
+                          :style="{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            zIndex: '2000',
+                            transform: 'translate(-50%,-50%)',
+                          }"
+                          @select="addEmoji"
+                          :showSearch="false"
+                          :showCategories="false"
+                        />
+                      </i>
+                    </div>
                     <textarea
+                      v-if="isLogin"
+                      v-focus
                       v-model="message"
                       rows="3"
                       class="textarea"
@@ -99,7 +204,10 @@
               </div>
               <footer class="card-footer is-justify-content-flex-end">
                 <div class="mr-5 py-3">
-                  <button class="button is-primary" @click="SendMessage">
+                  <button
+                    class="button is-primary is-small"
+                    @click="SendMessage"
+                  >
                     <span>发送</span>
                     <span class="icon">
                       <i class="iconfont icon-send"></i>
@@ -108,11 +216,25 @@
                 </div>
               </footer>
             </div>
-          </template>
-          <template v-else>
-            <div class="card">
+          </transition>
+          <transition
+            mode="in-out"
+            enter-active-class="animate__animated animate__fadeInLeft "
+            leave-active-class="animate__animated animate__fadeOutRight"
+          >
+            <div
+              class="card"
+              v-show="!isLogin"
+              style="position: absolute; width: 100%"
+            >
               <div class="card-content">
-                <p class="title is-5 has-text-primary has-text-centered">
+                <p
+                  class="
+                    title
+                    is-size-5-desktop is-size-6-touch
+                    has-text-primary has-text-centered
+                  "
+                >
                   给自己一个昵称
                 </p>
                 <div class="field">
@@ -124,13 +246,14 @@
                       type="text"
                       placeholder="Please enter your username"
                       v-on:keyup.enter="Login"
+                      v-focus
                     />
                   </div>
                 </div>
               </div>
               <footer class="card-footer is-justify-content-flex-end">
                 <div class="mr-5 py-3">
-                  <button class="button is-primary" @click="Login">
+                  <button class="button is-primary is-small" @click="Login">
                     <span>Let's Chat!</span>
                     <span class="icon">
                       <i class="iconfont icon-dialogue1"></i>
@@ -139,7 +262,7 @@
                 </div>
               </footer>
             </div>
-          </template>
+          </transition>
         </div>
       </div>
     </div>
@@ -147,15 +270,16 @@
 </template>
 
 <script>
-
+import { Picker } from "emoji-mart-vue";
 export default {
   name: "Home",
-  components: {},
+  components: { Picker },
   props: {},
   filters: {},
   data() {
     return {
       isLogin: false, //是否已登录
+      isEmoji: false,
       userName: "",
       isLoginTip: "",
       loginUserList: [],
@@ -167,10 +291,37 @@ export default {
   computed: {},
   watch: {},
   methods: {
+    emojiFunc() {
+      this.isEmoji = !this.isEmoji;
+    },
+    addEmoji(e) {
+      this.message += e.native;
+    },
+    scrollFunc() {
+      this.$nextTick(() => {
+        this.$refs.ulbox.scrollTop = this.$refs.ulbox.scrollHeight;
+      });
+    },
+    Disconnect() {
+      let that = this;
+      that.$socket.emit("deleteUser", that.userName, () => {
+        that.$Message.success({
+          content: "退出成功",
+          duration: 1,
+        });
+        this.userName = "";
+        that.isLogin = false;
+      });
+      // this.$Dialog.default({
+      //   title: "温馨提醒",
+      //   content: "是否退出？",
+      //   ok() {},
+      // });
+    },
     Login() {
       if (this.userName.trim().length === 0) {
         this.$Message.warning({
-          content: "The name cannot be empty！",
+          content: "昵称不可为空！",
           duration: 2,
         });
         return;
@@ -192,6 +343,7 @@ export default {
           duration: 1,
         });
         this.message = "";
+        this.scrollFunc();
       });
     },
   },
@@ -200,17 +352,89 @@ export default {
   //监听server发送回来的东西
   sockets: {
     //监听用户列表
-    updateUser(data) {
+    updateUserList(data) {
       this.loginUserList = data;
     },
     //监听消息列表
     output(data) {
       this.messageList.push(data);
     },
+    //监听名字是否重复
+    duplicateName(data) {
+      this.$Message.error({
+        content: data,
+        duration: 2,
+      });
+    },
+    //已连接
+    isConnection(data) {
+      this.$Message.success({
+        content: data,
+        duration: 2,
+      });
+    },
+    updateUser(data) {
+      this.$Message.default({
+        slots: `<div style="text-align:center;"><img style="width:20px;height:20px;" src="http://www.xvue.cn/dist/static/img/xvue-ui.dd56c7b.png"><p style="text-align:center;">${data}</p></div>`,
+        backgroundColor: "#fff",
+        textColor: "rgb(99,205,255)",
+        duration: 2,
+      });
+    },
   },
 };
 </script>
-<style lang="scss" scoped>
-.wrap {
+<style lang="scss"  scope>
+.thumeColor {
+  color: #00d1b2;
+}
+.div-box {
+  max-height: 160px;
+  overflow-y: scroll;
+}
+.list-p:hover {
+  background-color: rgba(100, 100, 100, 0.2);
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  letter-spacing: 0.06rem;
+}
+.ul-box {
+  max-height: 205px;
+  overflow-y: auto;
+}
+/*滚动条宽 长,滚动条整体部分，其中的属性有width,height,background,border等。*/
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+/*滚动条的滑轨背景颜色,可以用display:none让其不显示，也可以添加背景图片，颜色改变显示效果。*/
+
+::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+  -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
+
+  border-radius: 5px;
+}
+
+/* 滑块颜色 */
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+
+  border-radius: 5px;
+}
+
+/*滚动条两端的按钮。可以用display:none让其不显示，也可以添加背景图片，颜色改变显示效果。*/
+
+::-webkit-scrollbar-button {
+  background-color: #eee;
+  display: none;
+}
+
+/* 横向滚动条和纵向滚动条相交处尖角的颜色 */
+
+::-webkit-scrollbar-corner {
+  background-color: black;
 }
 </style>

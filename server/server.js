@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: NanKe
  * @Date: 2021-12-21 22:44:39
- * @LastEditTime: 2021-12-22 23:16:30
+ * @LastEditTime: 2021-12-23 20:46:14
  * @LastEditors: NanKe
  * @Cnblogs: https://www.cnblogs.com/NanKe-Studying/
  * @FilePath: \Chat-Socket.io-ExpressJS\server\server.js
@@ -14,17 +14,21 @@ const io = require('socket.io')(server, { cors: true });
 let connectedUser = []
 //实时通讯的连接
 io.on('connection', (socket) => {
-    //已连接
-    console.log('连接成功');
-    updateUserName()
+    socket.emit("isConnection", "欢迎进入NanKe's Chat")
+    updateUserList()
     //监听客户端Login
     let userName = "";
     socket.on('Login', (name, callback) => {
         if (name.trim().length === 0) return
+        if (connectedUser.length > 0 && connectedUser.indexOf(name) != -1) {
+            socket.emit('duplicateName', `用户${name}已存在！`)
+            return
+        }
         callback(true)
         userName = name
         connectedUser.push(userName)
-        updateUserName()
+        updateUser(`欢迎${userName}加入聊天室`)
+        updateUserList()
     })
 
     //监听客户端message
@@ -36,18 +40,31 @@ io.on('connection', (socket) => {
         })
         callback(true)
     })
+    //监听客户端deleteUser
+    socket.on('deleteUser', (name, callback) => {
+        if (name.trim().length === 0) return
+        let index = connectedUser.indexOf(name)
+        if (index != -1) {
+            connectedUser.splice(index, 1)
+        }
+        updateUserList()
+        callback(true)
+    })
     //断开连接
     socket.on('disconnect', () => {
-        console.log('断开连接');
         let index = connectedUser.indexOf(userName)
         if (index != -1) {
             connectedUser.splice(index, 1)
         }
-        updateUserName()
+        updateUser(`用户${userName}退出聊天室`)
+        updateUserList()
     });
     //将用户列表发送回客户端
-    function updateUserName() {
-        io.emit("updateUser", connectedUser)
+    function updateUserList() {
+        io.emit("updateUserList", connectedUser)
+    }
+    function updateUser(msg){
+        io.emit("updateUser", msg)
     }
 });
 
