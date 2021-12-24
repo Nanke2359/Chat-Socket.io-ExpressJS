@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: NanKe
  * @Date: 2021-12-21 19:55:43
- * @LastEditTime: 2021-12-24 11:59:10
+ * @LastEditTime: 2021-12-24 12:10:12
  * @LastEditors: NanKe
  * @Cnblogs: https://www.cnblogs.com/NanKe-Studying/
  * @FilePath: \Chat-Socket.io-ExpressJS\web\src\main.js
@@ -27,7 +27,8 @@ import VueSocketIO from 'vue-socket.io'
 
 Vue.use(new VueSocketIO({
   debug: true,
-  connection: SocketIO('http://localhost:5000'),
+  // connection: SocketIO('http://localhost:5000'),
+  connection: SocketIO('http://nanke777.vaiwan.com'),
 
 }))
 

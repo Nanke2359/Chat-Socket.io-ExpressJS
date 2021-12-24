@@ -2,26 +2,33 @@
  * @Description: 
  * @Author: NanKe
  * @Date: 2021-12-21 19:55:43
- * @LastEditTime: 2021-12-24 11:48:23
+ * @LastEditTime: 2021-12-24 20:43:32
  * @LastEditors: NanKe
  * @Cnblogs: https://www.cnblogs.com/NanKe-Studying/
  * @FilePath: \Chat-Socket.io-ExpressJS\web\src\views\Home.vue
 -->
 <template>
   <div>
-    <audio ref="audio" src="../assets/新消息提示音.wav" />
+    <audio muted ref="audio" :src="audioSrc" />
     <div
       class="
         animate__animated animate__fadeInDown
         wrap
         has-background-primary
-        is-flex is-justify-content-center
+        is-flex is-justify-content-space-around is-align-items-center
         py-2
       "
     >
+      <i></i>
       <p class="has-text-white is-size-5-desktop is-size-6-touch" href="#">
         NanKe's Chat
       </p>
+      <i
+        class="iconfont"
+        style="font-size: 1.2rem; cursor: pointer; color: #ffffff"
+        :class="[isOpenMusic ? 'icon-shengyin' : 'icon-shengyinguanbi']"
+        @click="isOpenMusic = !isOpenMusic"
+      ></i>
     </div>
     <div
       class="
@@ -33,7 +40,7 @@
       "
     >
       <div class="columns is-justify-content-space-between">
-        <div class="column is-one-third">
+        <div class="column is-4-desktop">
           <p
             class="
               title
@@ -73,7 +80,7 @@
             </template>
           </div>
         </div>
-        <div style="position: relative" class="column is-offset-1">
+        <div style="position: relative" class="column is-7-desktop">
           <transition
             mode="in-out"
             enter-active-class="animate__animated animate__fadeInLeft"
@@ -82,7 +89,7 @@
             <div
               class="card"
               v-show="isLogin"
-              style="position: absolute; width: 100%"
+              style="position: absolute; width: 93.5%"
             >
               <div class="card-content">
                 <div
@@ -114,7 +121,7 @@
                 </div>
 
                 <article class="message is-link">
-                  <div class="message-body">
+                  <div class="message-body" style="padding: 10px 12px">
                     <div v-show="messageList.length > 0">
                       <p
                         class="
@@ -239,7 +246,7 @@
             <div
               class="card"
               v-show="!isLogin"
-              style="position: absolute; width: 100%"
+              style="position: absolute; width: 93.5%"
             >
               <div class="card-content">
                 <p
@@ -299,28 +306,31 @@ export default {
       loginUserList: [],
 
       message: "",
-      messageList: [
-        // {
-        //   userName: "001",
-        //   msg: "沃尔ui粉丝的尬度过覅岁的法国多少衣服给",
-        //   isMe: true,
-        //   time: "11:22:33",
-        // },
-        // {
-        //   userName: "002",
-        //   msg: "沃尔ui粉丝的尬度过覅岁的法国多少衣服给",
-        //   isMe: false,
-        //   time: "11:22:33",
-        // },
-      ],
-      isMe: true, //msg是否是自己发的
+      messageList: [],
+      isMine: true, //msg是否是自己发的
+      audioSrc: "",
+      isOpenMusic: false,
     };
   },
   computed: {},
-  watch: {},
+  watch: {
+    isOpenMusic: {
+      handler(val) {
+        if (val) {
+          this.$refs.audio.muted = "";
+          console.log("有声音");
+        } else {
+          this.$refs.audio.muted = "muted";
+          console.log("静音");
+        }
+      },
+    },
+  },
   methods: {
     audioPlay() {
-      this.$refs.audio.play();
+      setTimeout(() => {
+        this.$refs.audio.play();
+      }, 10);
     },
     emojiFunc() {
       this.isEmoji = !this.isEmoji;
@@ -378,6 +388,10 @@ export default {
     //监听用户列表
     updateUserList(data) {
       this.loginUserList = data;
+      if (this.isOpenMusic) {
+        this.audioSrc = require("../assets/上线.wav");
+        this.audioPlay();
+      }
     },
     //监听消息列表
     output(data) {
@@ -385,6 +399,7 @@ export default {
       const resSult = Object.assign(data, { isMe });
       this.messageList.push(resSult);
       this.scrollFunc();
+      this.audioSrc = require("../assets/微信语音消息发送音效.wav");
       if (!isMe) this.audioPlay();
     },
     //监听名字是否重复
@@ -478,7 +493,7 @@ export default {
 }
 .div-box {
   max-height: 160px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 .list-p:hover {
   background-color: rgba(100, 100, 100, 0.2);
@@ -490,7 +505,7 @@ export default {
   width: 100%;
   max-height: 240px;
   overflow-y: auto;
-  padding: 0 0.2rem;
+  padding: 0 0.6375rem 0 0.2rem;
 }
 /*滚动条宽 长,滚动条整体部分，其中的属性有width,height,background,border等。*/
 ::-webkit-scrollbar {
