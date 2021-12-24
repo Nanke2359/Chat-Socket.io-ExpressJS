@@ -2,13 +2,14 @@
  * @Description: 
  * @Author: NanKe
  * @Date: 2021-12-21 19:55:43
- * @LastEditTime: 2021-12-23 21:10:05
+ * @LastEditTime: 2021-12-24 11:48:23
  * @LastEditors: NanKe
  * @Cnblogs: https://www.cnblogs.com/NanKe-Studying/
  * @FilePath: \Chat-Socket.io-ExpressJS\web\src\views\Home.vue
 -->
 <template>
   <div>
+    <audio ref="audio" src="../assets/新消息提示音.wav" />
     <div
       class="
         animate__animated animate__fadeInDown
@@ -67,7 +68,7 @@
                   py-2
                 "
               >
-                暂无用户！
+                暂无用户
               </p>
             </template>
           </div>
@@ -119,36 +120,49 @@
                         class="
                           title
                           is-size-6-desktop is-size-7-touch
-                          mb-3
+                          mb-4
                           has-text-link has-text-centered
                         "
                       >
                         消息列表
                       </p>
                       <ul ref="ulbox" class="ul-box">
-                        <li v-for="(item, index) in messageList" :key="index">
-                          <div
-                            class="
-                              tags
-                              has-addons has-background-warning-light
-                              pl-3
-                            "
-                          >
+                        <li
+                          v-for="(item, index) in messageList"
+                          :key="index"
+                          class="mb-4"
+                          :class="[item.isMe ? 'ismeli-div' : 'nomeli-div']"
+                        >
+                          <div class="is-flex is-justify-content-center mb-4">
                             <span
-                              class="
-                                is-size-6-desktop is-size-7-touch
-                                has-text-weight-semibold
+                              style="
+                                color: #ffffff;
+                                background-color: rgba(0, 0, 0, 0.18);
+                                padding: 4px;
+                                font-size: 14px;
+                                border-radius: 2px;
                               "
-                              >{{ item.userName }}：</span
+                              >{{ item.time }}</span
                             >
-                            <span
+                          </div>
+                          <div>
+                            <div
+                              class="is-size-6-desktop is-size-7-touch"
+                              :style="{
+                                float: item.isMe ? 'right' : 'left',
+                              }"
+                            >
+                              {{ item.userName }}
+                            </div>
+                            <div
                               class="
+                                message-li
                                 is-size-6-desktop is-size-7-touch
-                                has-text-black-bis
                               "
-                              >{{ item.msg }}</span
+                              :class="[item.isMe ? 'ismeli' : 'nomeli']"
                             >
-                            <hr />
+                              {{ item.msg }}
+                            </div>
                           </div>
                         </li>
                       </ul>
@@ -168,7 +182,7 @@
                 <div class="field pt-1">
                   <label class="label">Message</label>
                   <div class="control">
-                    <div class="py-2">
+                    <div class="py-1">
                       <i
                         @click="emojiFunc"
                         class="iconfont icon-emoji"
@@ -285,12 +299,29 @@ export default {
       loginUserList: [],
 
       message: "",
-      messageList: [],
+      messageList: [
+        // {
+        //   userName: "001",
+        //   msg: "沃尔ui粉丝的尬度过覅岁的法国多少衣服给",
+        //   isMe: true,
+        //   time: "11:22:33",
+        // },
+        // {
+        //   userName: "002",
+        //   msg: "沃尔ui粉丝的尬度过覅岁的法国多少衣服给",
+        //   isMe: false,
+        //   time: "11:22:33",
+        // },
+      ],
+      isMe: true, //msg是否是自己发的
     };
   },
   computed: {},
   watch: {},
   methods: {
+    audioPlay() {
+      this.$refs.audio.play();
+    },
     emojiFunc() {
       this.isEmoji = !this.isEmoji;
     },
@@ -303,20 +334,14 @@ export default {
       });
     },
     Disconnect() {
-      let that = this;
-      that.$socket.emit("deleteUser", that.userName, () => {
-        that.$Message.success({
+      this.$socket.emit("deleteUser", this.userName, () => {
+        this.$Message.success({
           content: "退出成功",
           duration: 1,
         });
         this.userName = "";
-        that.isLogin = false;
+        this.isLogin = false;
       });
-      // this.$Dialog.default({
-      //   title: "温馨提醒",
-      //   content: "是否退出？",
-      //   ok() {},
-      // });
     },
     Login() {
       if (this.userName.trim().length === 0) {
@@ -343,7 +368,6 @@ export default {
           duration: 1,
         });
         this.message = "";
-        this.scrollFunc();
       });
     },
   },
@@ -357,7 +381,11 @@ export default {
     },
     //监听消息列表
     output(data) {
-      this.messageList.push(data);
+      const isMe = this.userName === data.userName;
+      const resSult = Object.assign(data, { isMe });
+      this.messageList.push(resSult);
+      this.scrollFunc();
+      if (!isMe) this.audioPlay();
     },
     //监听名字是否重复
     duplicateName(data) {
@@ -373,6 +401,7 @@ export default {
         duration: 2,
       });
     },
+    //广播用户
     updateUser(data) {
       this.$Message.default({
         slots: `<div style="text-align:center;"><img style="width:20px;height:20px;" src="http://www.xvue.cn/dist/static/img/xvue-ui.dd56c7b.png"><p style="text-align:center;">${data}</p></div>`,
@@ -385,6 +414,65 @@ export default {
 };
 </script>
 <style lang="scss"  scope>
+.message-li {
+  max-width: 60%;
+  padding: 10px 11px;
+  color: #000000;
+  line-height: 1.3;
+  letter-spacing: 0.5px;
+}
+
+.nomeli-div {
+  width: 100%;
+  float: left;
+}
+.ismeli-div {
+  width: 100%;
+  float: right;
+}
+.nomeli {
+  float: left;
+  background-color: #ffffff;
+  margin-left: 9px;
+  word-break: break-all;
+  word-wrap: break-word;
+  position: relative;
+}
+.nomeli::after {
+  position: absolute;
+  left: -5px;
+  top: 5px;
+  content: "";
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-right: 5px solid #ffffff;
+  border-bottom: 4px solid transparent;
+}
+.ismeli {
+  float: right;
+  background-color: #98e165;
+  margin-right: 9px;
+  word-break: break-all;
+  word-wrap: break-word;
+  position: relative;
+}
+.ismeli::after {
+  position: absolute;
+  right: -5px;
+  top: 5px;
+  content: "";
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-left: 5px solid #98e165;
+  border-bottom: 4px solid transparent;
+}
+.ycyc {
+  word-break: break-all;
+  word-wrap: break-word;
+  padding: 0.8rem;
+}
 .thumeColor {
   color: #00d1b2;
 }
@@ -399,11 +487,12 @@ export default {
   letter-spacing: 0.06rem;
 }
 .ul-box {
-  max-height: 205px;
+  width: 100%;
+  max-height: 240px;
   overflow-y: auto;
+  padding: 0 0.2rem;
 }
 /*滚动条宽 长,滚动条整体部分，其中的属性有width,height,background,border等。*/
-
 ::-webkit-scrollbar {
   width: 7px;
 }
@@ -413,7 +502,6 @@ export default {
 ::-webkit-scrollbar-track {
   background-color: #f5f5f5;
   -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
-
   border-radius: 5px;
 }
 
@@ -421,19 +509,16 @@ export default {
 
 ::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.2);
-
   border-radius: 5px;
 }
 
 /*滚动条两端的按钮。可以用display:none让其不显示，也可以添加背景图片，颜色改变显示效果。*/
-
 ::-webkit-scrollbar-button {
   background-color: #eee;
   display: none;
 }
 
 /* 横向滚动条和纵向滚动条相交处尖角的颜色 */
-
 ::-webkit-scrollbar-corner {
   background-color: black;
 }

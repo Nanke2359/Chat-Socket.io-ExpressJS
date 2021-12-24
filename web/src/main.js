@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: NanKe
  * @Date: 2021-12-21 19:55:43
- * @LastEditTime: 2021-12-23 19:25:54
+ * @LastEditTime: 2021-12-24 11:59:10
  * @LastEditors: NanKe
  * @Cnblogs: https://www.cnblogs.com/NanKe-Studying/
  * @FilePath: \Chat-Socket.io-ExpressJS\web\src\main.js
@@ -13,6 +13,7 @@ import router from './router'
 import store from './store'
 
 import '../src/common/iconfont.css'
+import '../src/common/base.css'
 
 import bulma from 'bulma'
 import 'bulma/css/bulma.css'
@@ -26,7 +27,7 @@ import VueSocketIO from 'vue-socket.io'
 
 Vue.use(new VueSocketIO({
   debug: true,
-  connection: SocketIO('http://nanke777.vaiwan.com'),
+  connection: SocketIO('http://localhost:5000'),
 
 }))
 

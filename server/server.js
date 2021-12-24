@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: NanKe
  * @Date: 2021-12-21 22:44:39
- * @LastEditTime: 2021-12-23 20:46:14
+ * @LastEditTime: 2021-12-24 11:38:40
  * @LastEditors: NanKe
  * @Cnblogs: https://www.cnblogs.com/NanKe-Studying/
  * @FilePath: \Chat-Socket.io-ExpressJS\server\server.js
@@ -11,6 +11,7 @@
 const app = require('express')();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, { cors: true });
+const dayjs = require('dayjs')
 let connectedUser = []
 //实时通讯的连接
 io.on('connection', (socket) => {
@@ -36,7 +37,8 @@ io.on('connection', (socket) => {
         if (msg.trim().length === 0) return
         io.emit('output', {
             userName,
-            msg
+            msg,
+            time: dayjs().format('HH:mm:ss')
         })
         callback(true)
     })
@@ -47,6 +49,7 @@ io.on('connection', (socket) => {
         if (index != -1) {
             connectedUser.splice(index, 1)
         }
+        updateUser(`用户${userName}退出聊天室`)
         updateUserList()
         callback(true)
     })
@@ -56,14 +59,13 @@ io.on('connection', (socket) => {
         if (index != -1) {
             connectedUser.splice(index, 1)
         }
-        updateUser(`用户${userName}退出聊天室`)
         updateUserList()
     });
     //将用户列表发送回客户端
     function updateUserList() {
         io.emit("updateUserList", connectedUser)
     }
-    function updateUser(msg){
+    function updateUser(msg) {
         io.emit("updateUser", msg)
     }
 });
