@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: NanKe
  * @Date: 2021-12-21 22:44:39
- * @LastEditTime: 2021-12-24 11:38:40
+ * @LastEditTime: 2021-12-27 13:08:46
  * @LastEditors: NanKe
  * @Cnblogs: https://www.cnblogs.com/NanKe-Studying/
  * @FilePath: \Chat-Socket.io-ExpressJS\server\server.js
@@ -17,8 +17,8 @@ let connectedUser = []
 io.on('connection', (socket) => {
     socket.emit("isConnection", "欢迎进入NanKe's Chat")
     updateUserList()
-    //监听客户端Login
     let userName = "";
+    //监听Login
     socket.on('Login', (name, callback) => {
         if (name.trim().length === 0) return
         if (connectedUser.length > 0 && connectedUser.indexOf(name) != -1) {
@@ -32,7 +32,7 @@ io.on('connection', (socket) => {
         updateUserList()
     })
 
-    //监听客户端message
+    //监听message
     socket.on('SendMessage', (msg, callback) => {
         if (msg.trim().length === 0) return
         io.emit('output', {
@@ -42,7 +42,7 @@ io.on('connection', (socket) => {
         })
         callback(true)
     })
-    //监听客户端deleteUser
+    //监听deleteUser
     socket.on('deleteUser', (name, callback) => {
         if (name.trim().length === 0) return
         let index = connectedUser.indexOf(name)
@@ -56,21 +56,20 @@ io.on('connection', (socket) => {
     //断开连接
     socket.on('disconnect', () => {
         let index = connectedUser.indexOf(userName)
-        if (index != -1) {
-            connectedUser.splice(index, 1)
-        }
+        if (index != -1) connectedUser.splice(index, 1)
         updateUserList()
     });
-    //将用户列表发送回客户端
+    //推送用户列表
     function updateUserList() {
         io.emit("updateUserList", connectedUser)
     }
+    //进入退出聊天室
     function updateUser(msg) {
         io.emit("updateUser", msg)
     }
 });
 
-let port = process.env.PORT || 5000;
+let port = process.env.PORT || 6000;
 server.listen(port, () => {
     console.log(`listening on http://localhost:${port}`);
 });  

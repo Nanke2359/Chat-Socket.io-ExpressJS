@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: NanKe
  * @Date: 2021-12-21 19:55:43
- * @LastEditTime: 2021-12-24 20:43:32
+ * @LastEditTime: 2021-12-25 14:19:26
  * @LastEditors: NanKe
  * @Cnblogs: https://www.cnblogs.com/NanKe-Studying/
  * @FilePath: \Chat-Socket.io-ExpressJS\web\src\views\Home.vue
@@ -307,7 +307,6 @@ export default {
 
       message: "",
       messageList: [],
-      isMine: true, //msg是否是自己发的
       audioSrc: "",
       isOpenMusic: false,
     };
